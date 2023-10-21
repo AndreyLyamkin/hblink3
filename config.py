@@ -31,7 +31,7 @@ import sys
 import const
 
 from socket import gethostbyname
-# Insert by Lyamkin
+
 import json
 
 
