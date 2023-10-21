@@ -1227,7 +1227,7 @@ if __name__ == '__main__':
     # Insert by Lyamkin
     # Update DMITRI list
     update_ids_task = task.LoopingCall(update_qra_ids)
-    rule_timer = update_ids_task.start(3600)  # Update every hour
+    rule_timer = update_ids_task.start(3600)  # Update task every hour
     rule_timer.addErrback(loopingErrHandle)
     # Insert by Lyamkin
 
