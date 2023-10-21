@@ -59,6 +59,8 @@ logger = logging.getLogger(__name__)
 # Import UNIT time from rules.py
 from rules import UNIT_TIME, STATIC_UNIT
 
+# Import for parsing file subscriber_ids.json
+import json
 
 # Does anybody read this stuff? There's a PEP somewhere that says I should do this.
 __author__     = 'Cortney T. Buffington, N0MJS'
@@ -83,7 +85,22 @@ time_20 = 630720000
 
 # Build a UNIT_MAP based on values in STATIC_MAP.
 for i in STATIC_UNIT:
-	UNIT_MAP[bytes_3(i[0])] = i[1], time() + time_20
+    UNIT_MAP[bytes_3(i[0])] = i[1], time() + time_20
+
+
+# Insert by Lyamkin
+def update_qra_ids():
+    file = open('subscriber_ids.json', 'r', encoding='utf-8')
+    dmrid = []
+    data = json.load(file)
+    for entry in data['users']:
+        id = int(entry['radio_id'])
+        dmrid.append((id, id))
+    CONFIG['GLOBAL']['REG_ACL'] = (True, dmrid)
+    CONFIG['GLOBAL']['SUB_ACL']= (True, dmrid)
+    logger.info('(REPORT) HBlink update DMR ID list. DMR ID counter = {}'.format(len(dmrid)))
+# Insert by Lyamkin
+
 
 # Timed loop used for reporting HBP status
 #
@@ -1206,5 +1223,12 @@ if __name__ == '__main__':
     stream_trimmer_task = task.LoopingCall(stream_trimmer_loop)
     stream_trimmer = stream_trimmer_task.start(5)
     stream_trimmer.addErrback(loopingErrHandle)
+
+    # Insert by Lyamkin
+    # Update DMITRI list
+    update_ids_task = task.LoopingCall(update_qra_ids)
+    rule_timer = update_ids_task.start(3600)  # Update every hour
+    rule_timer.addErrback(loopingErrHandle)
+    # Insert by Lyamkin
 
     reactor.run()

@@ -31,6 +31,9 @@ import sys
 import const
 
 from socket import gethostbyname
+# Insert by Lyamkin
+import json
+
 
 # Does anybody read this stuff? There's a PEP somewhere that says I should do this.
 __author__     = 'Cortney T. Buffington, N0MJS'
@@ -45,6 +48,15 @@ __email__      = 'n0mjs@me.com'
 def process_acls(_config):
     # Global registration ACL
     _config['GLOBAL']['REG_ACL'] = acl_build(_config['GLOBAL']['REG_ACL'], const.PEER_MAX)
+
+# Reading from subscriber_ids.json DMRID and create list
+    file = open('subscriber_ids.json', 'r', encoding='utf-8')
+    dmrid = []
+    data = json.load(file)
+    for entry in data['users']:
+        id = int(entry['radio_id'])
+        dmrid.append((id, id))
+    _config['GLOBAL']['REG_ACL'] = (True, dmrid)
 
     # Global subscriber and TGID ACLs
     for acl in ['SUB_ACL', 'TG1_ACL', 'TG2_ACL']:
